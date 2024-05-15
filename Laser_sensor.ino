@@ -1,9 +1,9 @@
-
 const int sensorPin = A0;
 const int laserPin = 2;
-String wheelPos = "segment";
-String prevWheelPos = "segment";
-int segmentCount = 0;
+String wheelPosType = "segment";
+String prevWheelPosType = "none";
+int currentSegmentIndex = 0;
+unsigned long lastReportTime = 0;
 
 void setup()
 {
@@ -13,48 +13,63 @@ void setup()
   // Set the sensor pin as an input
   pinMode(sensorPin, INPUT);
   pinMode(laserPin, OUTPUT);
+
+  digitalWrite(laserPin, HIGH);
+
+  // delay in setup, allowing laser and sensor to be stable first
+  delay(1000);
+  Serial.println("\n\nSystem ready");
 }
 
 void loop()
 {
-  digitalWrite(laserPin, HIGH);
   int sensorState = analogRead(sensorPin);
 
   // Serial.println(sensorState);
 
   if (sensorState > 700)
   {
-    wheelPos = "divider";
+    wheelPosType = "divider";
   }
   else
   {
-    wheelPos = "segment";
+    wheelPosType = "segment";
   }
 
   // Check for transition from divider to segment
-  if (prevWheelPos == "divider" && wheelPos == "segment")
+  if (prevWheelPosType == "divider" && wheelPosType == "segment")
   {
-    segmentCount++; // Increment segment count only on transition from divider to segment
-    Serial.print("Segment count: ");
-    Serial.println(segmentCount);
+    // wheel position count go back to 0 after 7
+    currentSegmentIndex = (currentSegmentIndex + 1) % 8;
+
+    // Serial.print("Segment count: ");
+    // Serial.println(currentSegmentIndex);
   }
 
-  // Update previous wheel position
-  prevWheelPos = wheelPos;
+  // Update previous wheel position type
+  prevWheelPosType = wheelPosType;
+
+  unsigned long currentTime = millis();
+  if (currentTime - lastReportTime >= 750)
+  {
+    lastReportTime = currentTime;
+    Serial.print("Current Wheel Position: ");
+    Serial.println(currentSegmentIndex);
+  }
 
   // Check for Serial input to reset the count
   if (Serial.available() > 0)
   {
-    String input = Serial.readStringUntil('\n'); // Read the incoming data as a string until newline
-    input.trim();                                // Trim any whitespace
+    String input = Serial.readStringUntil('\n');
+    input.trim();
 
     if (input.equalsIgnoreCase("reset"))
     {
-      segmentCount = 0; // Reset the segment count
-      Serial.println("Segment count reset to 0");
+      currentSegmentIndex = 0;
+      Serial.println("Wheel position now at 0");
     }
   }
 
-  // Add a short delay before the next reading
+  // System delay, keep low for accurate sensor
   delay(1);
 }
