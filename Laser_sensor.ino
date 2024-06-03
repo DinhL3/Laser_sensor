@@ -40,7 +40,7 @@ void loop()
   if (prevWheelPosType == "divider" && wheelPosType == "segment")
   {
     // wheel position count go back to 0 after 7
-    currentSegmentIndex = (currentSegmentIndex + 1) % 8;
+    currentSegmentIndex = (currentSegmentIndex + 1) % 50;
 
     // Serial.print("Segment count: ");
     // Serial.println(currentSegmentIndex);
@@ -55,6 +55,8 @@ void loop()
     lastReportTime = currentTime;
     Serial.print("Current Wheel Position: ");
     Serial.println(currentSegmentIndex);
+    // Serial.print("Current sensor value: ");
+    // Serial.println(sensorState);
   }
 
   // Check for Serial input to reset the count
@@ -71,5 +73,5 @@ void loop()
   }
 
   // System delay, keep low for accurate sensor
-  delay(1);
+  delay(0);
 }
