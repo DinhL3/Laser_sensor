@@ -50,7 +50,7 @@ void loop()
   prevWheelPosType = wheelPosType;
 
   unsigned long currentTime = millis();
-  if (currentTime - lastReportTime >= 750)
+  if (currentTime - lastReportTime >= 100)
   {
     lastReportTime = currentTime;
     Serial.print("Current Wheel Position: ");
