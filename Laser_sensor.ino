@@ -25,7 +25,6 @@ void loop()
 {
   int sensorState = analogRead(sensorPin);
 
-  // Serial.println(sensorState);
 
   if (sensorState > 700)
   {
@@ -39,24 +38,19 @@ void loop()
   // Check for transition from divider to segment
   if (prevWheelPosType == "divider" && wheelPosType == "segment")
   {
-    // wheel position count go back to 0 after 7
+    // wheel position count go back to 0 after 49
     currentSegmentIndex = (currentSegmentIndex + 1) % 50;
-
-    // Serial.print("Segment count: ");
-    // Serial.println(currentSegmentIndex);
   }
 
   // Update previous wheel position type
   prevWheelPosType = wheelPosType;
 
   unsigned long currentTime = millis();
-  if (currentTime - lastReportTime >= 100)
+  if (currentTime - lastReportTime >= 100) // Lowest optimal value for websocket and frontend. Dont put lower than 100
   {
     lastReportTime = currentTime;
     Serial.print("Current Wheel Position: ");
     Serial.println(currentSegmentIndex);
-    // Serial.print("Current sensor value: ");
-    // Serial.println(sensorState);
   }
 
   // Check for Serial input to reset the count
@@ -72,6 +66,5 @@ void loop()
     }
   }
 
-  // System delay, keep low for accurate sensor
-  delay(0);
+  delay(1);
 }
